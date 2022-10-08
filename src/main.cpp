@@ -1,19 +1,58 @@
 #include <Arduino.h>
 
-const int led_pin = 22;
+#include <Adafruit_MPU6050.h>
+#include <Adafruit_Sensor.h>
+#include <Wire.h>
 
-void setup() {
+Adafruit_MPU6050 mpu;
+
+void setup(void) {
   Serial.begin(115200);
 
-  pinMode(led_pin, OUTPUT);
+  // Try to initialize!
+  if (!mpu.begin()) {
+    Serial.println("Failed to find MPU6050 chip");
+    while (1) {
+      delay(10);
+    }
+  }
+  Serial.println("MPU6050 Found!");
 
-  Serial.println("Startup Complete!");
+  mpu.setAccelerometerRange(MPU6050_RANGE_16_G);
+
+  mpu.setGyroRange(MPU6050_RANGE_2000_DEG);
+
+  Serial.println("Setup Complete!");
+  delay(100);
 }
 
 void loop() {
-  Serial.println("Looping!");
-  digitalWrite(led_pin, HIGH);
-  delay(500);
-  digitalWrite(led_pin, LOW);
+
+  /* Get new sensor events with the readings */
+  sensors_event_t a, g, temp;
+  mpu.getEvent(&a, &g, &temp);
+
+  /* Print out the values */
+  Serial.print("Acceleration X: ");
+  Serial.print(a.acceleration.x);
+  Serial.print(", Y: ");
+  Serial.print(a.acceleration.y);
+  Serial.print(", Z: ");
+  Serial.print(a.acceleration.z);
+  Serial.println(" m/s^2");
+
+  Serial.print("Rotation X: ");
+  Serial.print(g.gyro.x);
+  Serial.print(", Y: ");
+  Serial.print(g.gyro.y);
+  Serial.print(", Z: ");
+  Serial.print(g.gyro.z);
+  Serial.println(" rad/s");
+
+  Serial.print("Temperature: ");
+  Serial.print(temp.temperature);
+  Serial.println(" degC");
+
+  Serial.println("");
   delay(500);
 }
