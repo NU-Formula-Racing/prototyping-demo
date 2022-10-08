@@ -6,8 +6,12 @@
 
 Adafruit_MPU6050 mpu;
 
+const int led_pin = 32;
+
 void setup(void) {
   Serial.begin(115200);
+
+  pinMode(led_pin, OUTPUT);
 
   // Try to initialize!
   if (!mpu.begin()) {
@@ -32,27 +36,15 @@ void loop() {
   sensors_event_t a, g, temp;
   mpu.getEvent(&a, &g, &temp);
 
-  /* Print out the values */
-  Serial.print("Acceleration X: ");
-  Serial.print(a.acceleration.x);
-  Serial.print(", Y: ");
-  Serial.print(a.acceleration.y);
-  Serial.print(", Z: ");
-  Serial.print(a.acceleration.z);
-  Serial.println(" m/s^2");
+  if ((a.acceleration.x > 10.0) &&
+      (a.acceleration.x < 11.0))
+  {
+    digitalWrite(led_pin, HIGH);
+  }
+  else
+  {
+    digitalWrite(led_pin, LOW);
+  }
 
-  Serial.print("Rotation X: ");
-  Serial.print(g.gyro.x);
-  Serial.print(", Y: ");
-  Serial.print(g.gyro.y);
-  Serial.print(", Z: ");
-  Serial.print(g.gyro.z);
-  Serial.println(" rad/s");
-
-  Serial.print("Temperature: ");
-  Serial.print(temp.temperature);
-  Serial.println(" degC");
-
-  Serial.println("");
-  delay(500);
+  delay(100);
 }
